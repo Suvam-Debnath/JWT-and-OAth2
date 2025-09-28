@@ -1,6 +1,7 @@
 package com.suvam.security.controller;
 
 import com.suvam.security.model.User;
+import com.suvam.security.service.JwtService;
 import com.suvam.security.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,6 +16,9 @@ public class UserController {
     private UserService service;
 
     @Autowired
+    private JwtService jwtService;
+
+    @Autowired
     private AuthenticationManager authenticationManager;
 
     @PostMapping("register")
@@ -26,7 +30,9 @@ public class UserController {
     public String login(@RequestBody User user){
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(),user.getPassword()));
-        if (authentication.isAuthenticated()) return  "Success";
+        if (authentication.isAuthenticated()) {
+            return jwtService.generateToken(user.getUsername());
+        }
         else return "Login Failed";
     }
 }
